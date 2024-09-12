@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chime Meeting</title>
+</head>
+<body>
+    <button id="joinMeeting">Join Meeting</button>
+
+    <script>
+        document.getElementById('joinMeeting').addEventListener('click', async () => {
+            // Create Meeting
+            const meetingResponse = await fetch('http://<Raspberry_Pi_IP>:3000/createMeeting', { method: 'POST' });
+            const meeting = await meetingResponse.json();
+
+            // Create Attendee
+            const attendeeResponse = await fetch('http://<Raspberry_Pi_IP>:3000/createAttendee', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ MeetingId: meeting.Meeting.MeetingId, ExternalUserId: 'user@domain.com' })
+            });
+
+            const attendee = await attendeeResponse.json();
+            console.log('Joined Meeting:', meeting, attendee);
+        });
+    </script>
+</body>
+</html>
