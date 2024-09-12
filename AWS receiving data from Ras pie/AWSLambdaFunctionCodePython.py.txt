@@ -1,0 +1,38 @@
+import json
+import boto3
+import time
+
+# Initialize AWS clients
+dynamodb = boto3.resource('dynamodb')
+s3 = boto3.client('s3')
+
+# DynamoDB table and S3 bucket
+dynamodb_table_name = 'SensorData'
+s3_bucket_name = 'raspberry-pi-data-bucket'
+
+# Lambda handler function
+def lambda_handler(event, context):
+    # Extract data from the event triggered by IoT Core
+    sensor_data = json.loads(event['body'])
+    
+    # Process and store data in DynamoDB
+    table = dynamodb.Table(dynamodb_table_name)
+    response = table.put_item(
+        Item={
+            'timestamp': str(time.time()),
+            'temperature': sensor_data.get('temperature'),
+            'humidity': sensor_data.get('humidity')
+        }
+    )
+
+    # Save raw data to S3
+    s3.put_object(
+        Bucket=s3_bucket_name,
+        Key=f"data_{int(time.time())}.json",
+        Body=json.dumps(sensor_data)
+    )
+
+    return {
+        'statusCode': 200,
+        'body': json.dumps('Data stored successfully')
+    }

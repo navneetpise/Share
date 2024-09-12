@@ -1,0 +1,36 @@
+import paho.mqtt.client as mqtt
+import ssl
+import json
+import time
+
+# Configuration
+client_id = "RaspberryPiClient"
+endpoint = "<YOUR_IOT_ENDPOINT>"  # Replace with your AWS IoT Core endpoint
+root_ca = "<PATH_TO_YOUR_ROOT_CA>"  # Path to root-CA.crt file
+private_key = "<PATH_TO_YOUR_PRIVATE_KEY>"  # Path to private.pem.key file
+certificate = "<PATH_TO_YOUR_CERTIFICATE>"  # Path to certificate.pem.crt file
+topic = "raspberrypi/sensorData"
+
+# Example data
+data = {
+    "temperature": 25.6,
+    "humidity": 60.5,
+    "timestamp": time.time()
+}
+
+# MQTT Client Setup
+mqtt_client = mqtt.Client(client_id)
+mqtt_client.tls_set(
+    root_ca,
+    certfile=certificate,
+    keyfile=private_key,
+    cert_reqs=ssl.CERT_REQUIRED,
+    tls_version=ssl.PROTOCOL_TLSv1_2
+)
+mqtt_client.connect(endpoint, 8883)
+
+# Publishing data
+mqtt_client.publish(topic, json.dumps(data))
+print("Data published to AWS IoT Core")
+
+mqtt_client.disconnect()
