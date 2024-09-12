@@ -1,0 +1,51 @@
+Project Overview
+Title: Integration of AWS Chime SDK on Raspberry Pi for Mobile Browser Access
+Objective: The project aims to integrate the AWS Chime SDK with a Raspberry Pi to enable real-time communication capabilities, such as audio and video streaming, accessible through a mobile browser. This integration facilitates creating and managing meetings, handling attendees, and establishing a seamless connection for users to interact with the Chime SDK services.
+
+Scope: The integration involves setting up the AWS Chime SDK, developing a server application on the Raspberry Pi, and creating a web client to interact with the Chime SDK. The project includes configuration of AWS services, development of server-side logic, and implementation of client-side functionality to ensure smooth communication and user experience.
+
+Project Phases:
+AWS Setup
+
+Configure AWS Account: Set up an AWS account and configure necessary services.
+Create IAM Role with Chime SDK Permissions: Define and assign IAM roles to manage access and permissions for Chime SDK operations.
+Raspberry Pi Setup
+
+Setup Raspberry Pi: Prepare the Raspberry Pi hardware and environment for development.
+Install Node.js and AWS CLI: Install necessary software packages for running the server and managing AWS services.
+Configure AWS CLI with Credentials: Set up AWS CLI with credentials to interact with AWS services.
+Create Node.js Application: Develop a Node.js application to handle server-side logic.
+Create server.js File: Implement the main server logic to interact with the Chime SDK.
+Run Node.js Server on Raspberry Pi: Launch the server to start handling requests.
+Meeting Creation
+
+Create HTML/JS Client - index.html: Develop a web client for user interaction.
+User Opens index.html on Mobile Browser: Access the client application from a mobile browser.
+Client Requests /createMeeting on Raspberry Pi Server: Initiate a request to create a new meeting.
+Raspberry Pi Authenticates with IAM: Authenticate the request using IAM credentials.
+Raspberry Pi Sends CreateMeetingCommand to Chime SDK: Command the Chime SDK to create a new meeting.
+Chime SDK Creates Meeting: Chime SDK processes the command and creates the meeting.
+Raspberry Pi Responds with Meeting Details: Return meeting details to the client.
+Attendee Creation
+
+Client Requests /createAttendee with MeetingId: Request to create an attendee for the meeting.
+Raspberry Pi Sends CreateAttendeeCommand to Chime SDK: Command the Chime SDK to add an attendee.
+Chime SDK Creates Attendee: Chime SDK processes the command and adds the attendee.
+Raspberry Pi Responds with Attendee Details: Return attendee details to the client.
+Meeting Connection
+
+Client Connects to Chime SDK Meeting: Establish a connection to the meeting using Chime SDK credentials.
+Streaming Audio/Video to Mobile Browser: Stream real-time audio and video to the mobile browser.
+Display Meeting on Mobile Browser: Render the meeting interface on the mobile browser.
+Deliverables:
+
+Configured AWS account and IAM roles.
+Fully operational Node.js server on Raspberry Pi.
+Web client (HTML/JS) for user access.
+Seamless integration of AWS Chime SDK with meeting and attendee management.
+Real-time audio and video streaming capabilities.
+Benefits:
+
+Enhanced communication capabilities with real-time audio and video streaming.
+Seamless user experience through mobile browsers.
+Efficient meeting management and attendee handling via AWS Chime SDK.
