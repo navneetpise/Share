@@ -1,0 +1,86 @@
+import cv2
+import numpy as np
+from keras.models import load_model
+from keras.preprocessing.image import img_to_array
+from googleapiclient.discovery import build
+
+# Load pre-trained models
+face_cascade = cv2.CascadeClassifier(cv2.data.haarcascades + 'haarcascade_frontalface_default.xml')
+emotion_model = load_model('emotion_model.h5')
+
+# Emotion labels
+emotion_labels = ['Angry', 'Disgust', 'Fear', 'Happy', 'Sad', 'Surprise', 'Neutral']
+
+# Initialize the camera
+camera = cv2.VideoCapture(0)
+
+# Initialize YouTube API
+api_key = 'YOUR_YOUTUBE_API_KEY'
+youtube = build('youtube', 'v3', developerKey=api_key)
+
+def get_music_recommendations(emotion):
+    search_query = {
+        'Happy': 'happy music',
+        'Sad': 'sad music',
+        'Angry': 'angry music',
+        'Fear': 'fearful music',
+        'Surprise': 'surprise music',
+        'Neutral': 'relaxing music'
+    }.get(emotion, 'relaxing music')
+
+    request = youtube.search().list(
+        part='snippet',
+        q=search_query,
+        type='video',
+        order='viewCount',
+        maxResults=5
+    )
+    response = request.execute()
+
+    videos = []
+    for item in response['items']:
+        video_id = item['id']['videoId']
+        video_title = item['snippet']['title']
+        video_url = f'https://www.youtube.com/watch?v={video_id}'
+        videos.append((video_title, video_url))
+
+    return videos
+
+while True:
+    ret, frame = camera.read()
+    if not ret:
+        break
+
+    gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+    faces = face_cascade.detectMultiScale(gray, 1.3, 5)
+
+    for (x, y, w, h) in faces:
+        roi_gray = gray[y:y+h, x:x+w]
+        roi_color = frame[y:y+h, x:x+w]
+
+        roi_gray = cv2.resize(roi_gray, (48, 48))
+        roi_gray = roi_gray.astype('float32') / 255
+        roi_gray = img_to_array(roi_gray)
+        roi_gray = np.expand_dims(roi_gray, axis=0)
+
+        emotion_prediction = emotion_model.predict(roi_gray)
+        max_index = np.argmax(emotion_prediction[0])
+        emotion_label = emotion_labels[max_index]
+
+        color = (0, 255, 0)
+        frame = cv2.rectangle(frame, (x, y), (x+w, y+h), color, 2)
+        frame = cv2.putText(frame, emotion_label, (x, y-10), cv2.FONT_HERSHEY_SIMPLEX, 0.9, color, 2)
+
+        # Get music recommendations based on detected emotion
+        recommendations = get_music_recommendations(emotion_label)
+        print(f'Recommended music for mood "{emotion_label}":')
+        for title, url in recommendations:
+            print(f'{title}: {url}')
+
+    cv2.imshow('Emotion Detection', frame)
+
+    if cv2.waitKey(1) & 0xFF == ord('q'):
+        break
+
+camera.release()
+cv2.destroyAllWindows()
